@@ -9,7 +9,7 @@ Here are the courses I am currently enrolled in or have completed at Prat Educac
 ## How to Use This Repository
 Clone the repository:
 
-    git clone https://github.com/your-username/prat-educacio-classes.git
+    https://github.com/Drareg04/Prat-Educacio.git
 
 ## Disclaimer:
 This repository is for educational purposes and is part of the 42 School curriculum. Some projects may be subject to specific guidelines or restrictions set by Prat Educació.
