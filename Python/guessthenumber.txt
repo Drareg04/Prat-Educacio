@@ -1,0 +1,23 @@
+import random
+
+x = random.randint(1,100)
+z = 10
+numero = False
+frase = "Endivina el numero del 1 al 100: "
+while (z>0):
+    y = int(input(frase))
+    if y == x:
+        numero = True
+        z=0
+    elif y < x:
+        z = z - 1
+        print("Error, et queden ", z, " intents.")
+        frase = ("El numero es mes gran que "+str(y)+": ")
+    elif y > x:
+        z = z - 1
+        print("Error, et queden ", z, " intents.")
+        frase = ("El numero es mes petit que " +str(y)+ ": ")
+if (numero):
+    print("Has encertat, el numero correcte era ", x)
+else:
+    print("Has fallat, el numero correcte era ", x)
