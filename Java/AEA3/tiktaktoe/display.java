@@ -13,10 +13,10 @@ public class  display {
         }else{
             System.out.println(blue + "O" + white + "'s turn\n");
         }
-        System.out.println(white + "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
-        int j = 0;
         char [][] game = global.getGame();
         char [][][][] matrix = global.getMatrix();
+        System.out.println(white + "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ");
+        int j = 0;
         for(int i = 0; i < matrix.length; i++) {
             for(int k = 0; k < matrix[i][j].length; k++) {
                 for(j = 0; j < matrix[i].length; j++) {

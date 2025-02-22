@@ -66,5 +66,21 @@ public class  place {
 
         }
         global.setMatrix(matrix);
+        global.setGame(game);
+    }
+    public void placedraw(int choice) {
+        char [][] game = global.getGame();
+        char [][][][] matrix = global.getMatrix();
+        int i, j;
+        char sign;
+        if (choice <= 3)
+            i = 0;
+        else if (choice <= 6)
+            i = 1;
+        else
+            i = 2;
+        j = choice - (i*3) - 1;
+        game[i][j] = 'd';
+        global.setGame(game);
     }
 }

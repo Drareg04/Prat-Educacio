@@ -1,6 +1,6 @@
 package tiktaktoe;
 public class  global {
-    public char [][] game = new char[3][3];
+    public static char [][] game = new char[3][3];
     // Getter
   	public char [][] getGame() {
     	return game;
@@ -9,8 +9,14 @@ public class  global {
   	public void setGame(char [][] newGame) {
     	this.game = newGame;
     }
-
-    public char [][][][] matrix = new char[3][3][3][3];
+    public void displayGame() {
+        for (int g = 0; g < 3; g++){
+            for (int g2 = 0; g2 < 3; g2++){
+                System.out.print(" " + game[g][g2] + " ");
+            }System.out.println();
+        }
+    }
+    public static char [][][][] matrix = new char[3][3][3][3];
     // Getter
   	public char [][][][] getMatrix() {
     	return matrix;
@@ -20,7 +26,7 @@ public class  global {
     	this.matrix = newMatrix;
     }
 
-    public int player;
+    public static int player;
     // Getter
   	public int getPlayer() {
     	return player;
@@ -30,7 +36,7 @@ public class  global {
     	this.player = newPlayer;
     }
 
-    public boolean draw = false;
+    public static boolean draw = false;
     // Getter
   	public boolean getDraw() {
     	return draw;
@@ -40,7 +46,7 @@ public class  global {
     	this.draw = newDraw;
     }
 
-    public boolean notfinished = true;
+    public static boolean notfinished = true;
     // Getter
   	public boolean getNotfinished() {
     	return notfinished;

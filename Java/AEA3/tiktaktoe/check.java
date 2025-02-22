@@ -2,7 +2,6 @@ package tiktaktoe;
 public class  check {
     private global global = new global();
 	public int checkwin(int choice) {
-        char [][] game = global.getGame();
         char [][][][] matrix = global.getMatrix();
         int i, j;
         char sign;
@@ -34,7 +33,13 @@ public class  check {
             return (1);
         if (matrix[i][j][0][2] == sign && matrix[i][j][1][1] == sign && matrix[i][j][2][0] == sign)
             return (1);
-        return (0);
+        for(int k = 0; k < matrix[i][j].length; k++) {
+            for(int l = 0; l < matrix[i][j][k].length; l++) {
+                if (matrix[i][j][k][l] == ' ')
+                    return (0);
+            }
+        }
+        return (2);
     }
     public int checkchoice(int choice) {
         char [][] game = global.getGame();
@@ -61,6 +66,7 @@ public class  check {
             }
         }
         game[i][j] = '1';
+        global.setGame(game);
         return (choice);
     }
     public boolean checkbigwin() {
@@ -87,16 +93,13 @@ public class  check {
             global.setNotfinished(false);
         if (game[0][2] == sign && game[1][1] == sign && game[2][0] == sign)
             global.setNotfinished(false);
-        if (!global.getNotfinished()){
-            for(int i = 0; i < 3; i++) {
-                for(int j = 0; j < 3; j++) {
-                    if (game[i][j] != 'X' || game[i][j] != 'O')
-                        return(false);                    
-                }
+        for(int i = 0; i < game.length; i++) {
+            for(int j = 0; j < game[i].length; j++) {
+                if (game[i][j] == ' ' || game[i][j] == '1')
+                    return (false);
             }
-            return(true);
-        }else{
-            return(false);
         }
+        global.setDraw(true);
+        return (true);
     }
 }

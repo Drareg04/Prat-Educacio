@@ -13,15 +13,15 @@ public class  tictactoe {
     private display display = new display();
     private check check = new check();
     public void start3(){
+        char p;
         tictactoe tictactoe = new tictactoe();
         Scanner num = new Scanner(System.in);
         Random randomNum = new Random();
-        global.setPlayer(randomNum.nextInt(2));
         int choice = 0;
         char [][] game = global.getGame();
         for(int i = 0; i < game.length; i++) {
             for(int j = 0; j < game[i].length; j++) {
-                game[i][j] = ' ';
+                game[i][j] = '1';
             }
         }
         global.setGame(game);
@@ -65,10 +65,20 @@ public class  tictactoe {
         System.out.println("░░░░\u001B[36m██║\u001B[91m░░░\u001B[36m██║╚█████╔╝\u001B[91m░░░\u001B[36m██║\u001B[91m░░░\u001B[36m██║\u001B[91m░░\u001B[36m██║╚█████╔╝\u001B[91m░░░\u001B[36m██║\u001B[91m░░░\u001B[36m╚█████╔╝███████╗\u001B[91m░");
         System.out.println("░░░░\u001B[36m╚═╝\u001B[91m░░░\u001B[36m╚═╝\u001B[91m░\u001B[36m╚════╝\u001B[91m░░░░\u001B[36m╚═╝\u001B[91m░░░\u001B[36m╚═╝\u001B[91m░░\u001B[36m╚═╝\u001B[91m░\u001B[36m╚════╝\u001B[91m░░░░\u001B[36m╚═╝\u001B[91m░░░░\u001B[36m╚════╝\u001B[91m░\u001B[36m╚══════╝\u001B[91m░");
         System.out.println("░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░" + white);
-        String wait = num.nextLine();
+        System.out.println("Who begins (X, O, R):");
+        do{
+            p = tictactoe.LLegirPTeclat(num);
+            }while(p == ' ');
+        if (p == 'r' || p == 'R')
+            global.setPlayer(randomNum.nextInt(2));
+        else if (p == 'x' || p == 'X')
+            global.setPlayer(0);
+        else
+            global.setPlayer(1);
         while(global.getNotfinished() && !global.getDraw()){
             display.displayall();
             if(choice == 0){
+                //Marca todos los espacios libres como jugables (verde)
                 game = global.getGame();
                 for (int g = 0; g < 3; g++){
                     for (int g2 = 0; g2 < 3; g2++){
@@ -90,9 +100,13 @@ public class  tictactoe {
                 chek = place.placesign(choice, choice2);
             }while(chek == 0);
             int win = check.checkwin(choice);
-            if (win == 1)
+            if (win == 1){
                 place.placewin(choice);
                 check.checkbigwin();
+            }else if (win == 2) {
+                place.placedraw(choice);
+                check.checkbigwin();
+            }
             choice = check.checkchoice(choice2);
             if (global.getNotfinished()){
                 if (global.getPlayer() == 0){
@@ -146,5 +160,17 @@ public class  tictactoe {
         
         Llegit = scan.nextInt();
         return Llegit;
+    }
+    public static char LLegirPTeclat(Scanner scan){
+        char llegit;
+
+        if (scan.hasNext()) {
+            String token = scan.next();
+            if (token.equals("x") || token.equals("X") || token.equals("o") || token.equals("O") || token.equals("r") || token.equals("R")) {
+                llegit = token.charAt(0);
+                return llegit;
+            }
+        }
+        return ' ';
     }
 }
