@@ -34,11 +34,15 @@ lives = 3
 last_difficulty_update_time = pygame.time.get_ticks()
 spawn_interval = 1500
 ADD_OBSTACLE = pygame.USEREVENT + 1
+last_shot_time = 0  # Track the time of the last shot
+shoot_cooldown = 300  # Cooldown time in milliseconds (0.5 seconds)
 
 # Images
 character = "srcs/paperplane.png"
 enemies = "srcs/scissors.png"
 bullet = "srcs/rock.png"
+background_image = pygame.image.load("srcs/background.jpg")
+background_image = pygame.transform.scale(background_image, (WIDTH, HEIGHT))
 # ========================
 # Funcions Auxiliars
 # ========================
@@ -46,8 +50,9 @@ bullet = "srcs/rock.png"
 def draw_text(surface, text, font, color, x, y):
     """Dibuixa un text a la pantalla."""
     text_obj = font.render(text, True, color)
-    surface.blit(text_obj, (x, y))
-
+    text_rect = text_obj.get_rect()
+    text_rect.center = (x, y)
+    surface.blit(text_obj, text_rect)
 # ========================
 # Classes del Joc
 # ========================
@@ -93,53 +98,60 @@ class Obstacle(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.image.load(enemies)
-        # Agafa les dimensions originals
         original_width, original_height = self.image.get_size()
-        # Crear un obstacle amb dimensions aleatòries
         width = random.randint(5, 30)
-        height = int(width*original_height/100)
-        self.image = pygame.transform.scale(self.image, (width*original_width/100, height))
+        height = int(width * original_height / 100)
+        self.image = pygame.transform.scale(self.image, (width * original_width / 100, height))
         self.rect = self.image.get_rect()
-        # Posició inicial: fora de la pantalla per la dreta
         self.rect.x = WIDTH + random.randint(10, 100)
         self.rect.y = random.randint(0, HEIGHT - height)
-        # La velocitat s'incrementa amb la dificultat
         self.speed = random.randint(3 + difficulty_level, 7 + difficulty_level)
 
     def update(self):
-        """Actualitza la posició de l'obstacle movent-lo cap a l'esquerra.
-           Quan surt completament de la pantalla, s'incrementa la puntuació i s'elimina."""
+        """Actualitza la posició de l'obstacle movent-lo cap a l'esquerra."""
         global score
         self.rect.x -= self.speed
         if self.rect.right < 0:
             score += 1
             self.kill()
-class Dispar(pygame.sprite.Sprite):
-    """Classe per als dispars."""
-    def __init__(self, x, y):
+
+
+class Projectile(pygame.sprite.Sprite):
+    """Classe per al projectil (roca)."""
+    def __init__(self, x, y, speed=10):
         super().__init__()
-        # Crear una bala amb dimensions
         self.image = pygame.image.load(bullet)
         self.image = pygame.transform.scale(self.image, (30, 30))
         self.rect = self.image.get_rect()
-        # Posició inicial: fora de la pantalla per la dreta
         self.rect.center = (x, y)
-        self.speed = 15
+        self.speed = speed
 
     def update(self):
-        """Actualitza la posició de l'obstacle movent-lo cap a l'esquerra.
-           Quan surt completament de la pantalla, s'incrementa la puntuació i s'elimina."""
         global score
+        """Move the projectile and check for collisions with obstacles."""
         self.rect.x += self.speed
-        if self.rect.right > WIDTH:
+
+        # If the projectile goes off-screen, remove it
+        if self.rect.left > WIDTH:
             self.kill()
+
+        # Check for collisions with obstacles
+        collided_obstacles = pygame.sprite.spritecollide(self, obstacles, True)
+        if collided_obstacles:
+            # If collision with an obstacle, kill the projectile and the obstacle
+            self.kill()
+            for obstacle in collided_obstacles:
+                obstacle.kill()
+                score += 1  # Optionally increment score for each obstacle hit
+
+
 # ========================
 # Funció per reinicialitzar el Joc
 # ========================
 
 def new_game():
     """Reinicialitza totes les variables i grups per començar una nova partida."""
-    global score, difficulty_level, lives, last_difficulty_update_time, spawn_interval, all_sprites, obstacles, player
+    global score, difficulty_level, lives, last_difficulty_update_time, spawn_interval, all_sprites, obstacles, player, projectiles
     score = 0
     difficulty_level = 1
     lives = 3
@@ -147,6 +159,7 @@ def new_game():
     spawn_interval = 1500
     pygame.time.set_timer(ADD_OBSTACLE, spawn_interval)
     all_sprites = pygame.sprite.Group()
+    projectiles = pygame.sprite.Group()
     obstacles = pygame.sprite.Group()
     player = Player()
     all_sprites.add(player)
@@ -166,9 +179,9 @@ def show_menu():
                 sys.exit()
             if event.type == pygame.KEYDOWN:
                 waiting = False
-        screen.fill(WHITE)
-        draw_text(screen, "Joc Extensible", font, BLACK, 300, 200)
-        draw_text(screen, "Prem qualsevol tecla per començar", font, BLACK, 220, 250)
+        screen.blit(background_image, (0, 0))
+        draw_text(screen, "Pedra Paper i Tisora", font, BLACK, WIDTH/2, HEIGHT/2-25)
+        draw_text(screen, "Prem qualsevol tecla per començar", font, RED, WIDTH/2, HEIGHT/2+25)
         pygame.display.flip()
 
 # ========================
@@ -211,7 +224,7 @@ def game_loop():
             else:
                 game_state = "game_over"
         # Dibuixar la escena
-        screen.fill(WHITE)
+        screen.blit(background_image, (0, 0))
         all_sprites.draw(screen)
         score_text = font.render("Puntuació: " + str(score), True, BLACK)
         difficulty_text = font.render("Dificultat: " + str(difficulty_level), True, BLACK)
@@ -225,8 +238,17 @@ def game_loop():
 # Funció per disparar
 # ========================
 
+# Create a projectile and add it to sprite groups
 def shoot():
-    """Dispara roca."""
+    """Dispara roca (bullet)."""
+    global last_shot_time
+
+    current_time = pygame.time.get_ticks()
+    if current_time - last_shot_time >= shoot_cooldown:
+        projectile = Projectile(player.rect.right, player.rect.centery)
+        all_sprites.add(projectile)
+        projectiles.add(projectile)
+        last_shot_time = current_time
 
 # ========================
 # Funció per mostrar la pantalla de Game Over
@@ -244,9 +266,9 @@ def show_game_over(final_score):
             if event.type == pygame.KEYDOWN:
                 waiting = False
         screen.fill(WHITE)
-        draw_text(screen, "Game Over!", font, RED, 350, 200)
-        draw_text(screen, "Puntuació Final: " + str(final_score), font, BLACK, 320, 250)
-        draw_text(screen, "Prem qualsevol tecla per reiniciar", font, BLACK, 250, 300)
+        draw_text(screen, "Game Over!", font, RED, WIDTH/2, HEIGHT/2-50)
+        draw_text(screen, "Puntuació Final: " + str(final_score), font, BLACK, WIDTH/2, HEIGHT/2-25)
+        draw_text(screen, "Prem qualsevol tecla per reiniciar", font, BLACK, WIDTH/2, HEIGHT/2+25)
         pygame.display.flip()
 # ========================
 # Funció per mostrar la pantalla de Pausa
@@ -264,8 +286,8 @@ def show_pause():
             if event.type == pygame.KEYDOWN:
                 waiting = False
         screen.fill(WHITE)
-        draw_text(screen, "Pause", font, RED, 350, 200)
-        draw_text(screen, "Prem qualsevol tecla per continuar", font, BLACK, 250, 300)
+        draw_text(screen, "Pause", font, RED, WIDTH/2, HEIGHT/2-25)
+        draw_text(screen, "Prem qualsevol tecla per continuar", font, BLACK, WIDTH/2, HEIGHT/2+25)
         pygame.display.flip()
 # ========================
 # Bucle principal del programa
