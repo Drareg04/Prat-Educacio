@@ -141,7 +141,7 @@ public class buttons extends JFrame {
         historyVisible = !historyVisible;
         historyPanel.setVisible(historyVisible);
         if (historyVisible) {
-            setSize(850, 800);
+            setSize(870, 800);
             historyToggleButton.setBackground(ORANGE);
         } else {
             setSize(600, 800);
